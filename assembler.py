@@ -185,12 +185,13 @@ def decimal_to_binary_twos_complement(decimal_num, num_bits):
 
 def is_R_type(ins):
     if len(ins) == 4:
-        if ins[pc] in r_ins:
+        if ins[0] in r_ins:
             if ins[1] in r_address:
                 if ins[2] in r_address:
                     if ins[3] in r_address:
                         return True
     else:
+
         return False
 
 def is_I_type(ins):
@@ -296,30 +297,33 @@ def assembly_to_binary(instruction):
         return answer
     elif is_B_type(ins):
         answer = ""
-        answer += decimal_to_binary_twos_complement(int(ins[3]), 12)[-1]
-        answer += decimal_to_binary_twos_complement(int(ins[3]), 12)[5:10]
+        answer += decimal_to_binary_twos_complement(int(ins[3]), 32)[12]
+        answer += decimal_to_binary_twos_complement(int(ins[3]), 32)[5:10]
         answer += r_address[ins[1]]
         answer += r_address[ins[2]]
         answer += b_ins[ins[0]]["funct3"]
-        answer += decimal_to_binary_twos_complement(int(ins[3]), 12)[1:4]
-        answer += decimal_to_binary_twos_complement(int(ins[3]), 12)[-2]
+        answer += decimal_to_binary_twos_complement(int(ins[3]), 32)[1:4]
+        answer += decimal_to_binary_twos_complement(int(ins[3]), 32)[11]
         answer += b_ins[ins[0]]["opcode"]
         return answer
     elif is_U_type(ins):
         answer = ""
-        answer += decimal_to_binary_twos_complement(int(ins[2]), 20)
+        answer += decimal_to_binary_twos_complement(int(ins[2]), 32)
         answer += r_address[ins[1]]
         answer += u_ins[ins[0]]["opcode"]
         return answer
     elif is_J_type(ins):
         answer = ""
-        answer += decimal_to_binary_twos_complement(int(ins[2]), 20)[-1]
-        answer += decimal_to_binary_twos_complement(int(ins[2]), 20)[10:1]
-        answer += decimal_to_binary_twos_complement(int(ins[2]), 20)[11]
-        answer += decimal_to_binary_twos_complement(int(ins[2]), 20)[19:12]
+        answer += decimal_to_binary_twos_complement(int(ins[2]), 32)[-1]
+        answer += decimal_to_binary_twos_complement(int(ins[2]), 32)[10:1]
+        answer += decimal_to_binary_twos_complement(int(ins[2]), 32)[11]
+        answer += decimal_to_binary_twos_complement(int(ins[2]), 32)[19:12]
         answer += r_address[ins[1]]
         answer += j_ins[ins[0]]["opcode"]
         return answer
+    else:
+        print("invalid instruction")
+        return ""
 
 
 
@@ -329,3 +333,4 @@ with open("file1.txt", "r") as file:
 with open("file1.txt", "w") as file:
     for i in instructions:
         file.write(assembly_to_binary(i))
+        pc += 1
