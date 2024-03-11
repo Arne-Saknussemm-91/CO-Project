@@ -174,6 +174,8 @@ u_ins = {
 j_ins = {
     "jal": {"opcode": "1101111"}}
 
+#above code was written by nitesh yadav
+
 def decimal_to_binary_twos_complement(decimal_num, num_bits):
     binary_str = bin(decimal_num & int("1"*num_bits, 2))[2:].zfill(num_bits)
 
@@ -222,6 +224,8 @@ def is_S_type(ins):
     else:
         return False
 
+#above code was written by shivang singh
+
 def is_B_type(ins):
     if len(ins) == 4:
         if ins[0] in b_ins:
@@ -266,6 +270,8 @@ def is_var(ins):
 
 def is_reg(ins):
     return ins in r_address
+
+#above code was written by utkarsh mishra
 
 def assembly_to_binary(instruction):
     ins = [i.strip() for i in ((instruction.replace(',', ' ')).replace('(', ' ')).replace(')', ' ').split()]
@@ -334,3 +340,5 @@ with open("file1.txt", "w") as file:
     for i in instructions:
         file.write(assembly_to_binary(i))
         pc += 1
+#above code was written by saksham kushwaha
+
