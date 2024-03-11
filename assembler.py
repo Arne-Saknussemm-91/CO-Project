@@ -175,12 +175,9 @@ j_ins = {
     "jal": {"opcode": "1101111"}}
 
 def decimal_to_binary_twos_complement(decimal_num, num_bits):
-    # Convert decimal to binary with specified number of bits
     binary_str = bin(decimal_num & int("1"*num_bits, 2))[2:].zfill(num_bits)
 
-    # Check if the number is negative
     if decimal_num < 0:
-        # Calculate 2's complement by flipping the bits and adding 1
         twos_complement = bin((int(binary_str, 2) ^ int("1"*num_bits, 2)) + 1)[2:].zfill(num_bits)
         return twos_complement
     else:
@@ -203,6 +200,7 @@ def is_I_type(ins):
                 if ins[2] in r_address:
                     try:
                         int(ins[3])
+                        return True
                     except:
                         print("not a number")
                         return False
@@ -230,15 +228,34 @@ def is_B_type(ins):
                 if ins[2] in r_address:
                     try:
                         ins[3].isdigit()
+                        return True
                     except:
                         print("not a number")
                         return False
+    else:
+        return False
 
 def is_U_type(ins):
-    return ins in u_ins
+    if len(ins) == 3:
+        if ins[0] in u_ins:
+            if ins[1] in r_address:
+                try:
+                    int(ins[2])
+                    return True
+                except:
+                    print("not a number")
+                    return False
 
 def is_J_type(ins):
-    return ins in j_ins
+    if len(ins) == 3:
+        if ins[0] in j_ins:
+            if ins[1] in r_address:
+                try:
+                    int(ins[2])
+                    return True
+                except:
+                    print("not a number")
+                    return False
 
 def is_label(ins):
     return ins[0] == ":"
@@ -250,7 +267,7 @@ def is_reg(ins):
     return ins in r_address
 
 def assembly_to_binary(instruction):
-    ins = [i.strip() for i in instruction.replace(',', ' ').split()]
+    ins = [i.strip() for i in ((instruction.replace(',', ' ')).replace('(', ' ')).replace(')', ' ').split()]
     if is_R_type(ins):
         answer = ""
         answer += r_ins[ins[0]]["funct7"]
@@ -270,26 +287,45 @@ def assembly_to_binary(instruction):
         return answer
     elif is_S_type(ins):
         answer = ""
-        answer += decimal_to_binary_twos_complement(int(ins[2]), 12)[5:12]
+        answer += decimal_to_binary_twos_complement(int(ins[2]), 12)[5:11]
         answer += r_address[ins[1]]
         answer += r_address[ins[3]]
         answer += s_ins[ins[0]]["funct3"]
-        answer += decimal_to_binary_twos_complement(int(ins[2]), 12)[0:5]
+        answer += decimal_to_binary_twos_complement(int(ins[2]), 12)[0:4]
         answer += s_ins[ins[0]]["opcode"]
+        return answer
     elif is_B_type(ins):
         answer = ""
-        answer += decimal_to_binary_twos_complement(int(ins[3]), 12)[5:12]
+        answer += decimal_to_binary_twos_complement(int(ins[3]), 12)[-1]
+        answer += decimal_to_binary_twos_complement(int(ins[3]), 12)[5:10]
         answer += r_address[ins[1]]
         answer += r_address[ins[2]]
         answer += b_ins[ins[0]]["funct3"]
-        answer += decimal_to_binary_twos_complement(int(ins[3]), 12)[0:5]
+        answer += decimal_to_binary_twos_complement(int(ins[3]), 12)[1:4]
+        answer += decimal_to_binary_twos_complement(int(ins[3]), 12)[-2]
         answer += b_ins[ins[0]]["opcode"]
+        return answer
     elif is_U_type(ins):
-        
+        answer = ""
+        answer += decimal_to_binary_twos_complement(int(ins[2]), 20)
+        answer += r_address[ins[1]]
+        answer += u_ins[ins[0]]["opcode"]
+        return answer
+    elif is_J_type(ins):
+        answer = ""
+        answer += decimal_to_binary_twos_complement(int(ins[2]), 20)[-1]
+        answer += decimal_to_binary_twos_complement(int(ins[2]), 20)[10:1]
+        answer += decimal_to_binary_twos_complement(int(ins[2]), 20)[11]
+        answer += decimal_to_binary_twos_complement(int(ins[2]), 20)[19:12]
+        answer += r_address[ins[1]]
+        answer += j_ins[ins[0]]["opcode"]
+        return answer
 
 
 
 with open("file1.txt", "r") as file:
     instructions = file.readlines()
 
-print(assembly_to_binary(instructions[0]))
+with open("file1.txt", "w") as file:
+    for i in instructions:
+        file.write(assembly_to_binary(i))
